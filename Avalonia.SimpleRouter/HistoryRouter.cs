@@ -11,7 +11,7 @@ public class HistoryRouter<TViewModelBase>: Router<TViewModelBase> where TViewMo
     public bool HasNext => _history.Count > 0 && _historyIndex < _history.Count - 1;
     public bool HasPrev => _historyIndex > 0;
     
-    public HistoryRouter(Func<TViewModelBase> createViewModel) : base(createViewModel)
+    public HistoryRouter(Func<Type, TViewModelBase> createViewModel) : base(createViewModel)
     {
     }
     
@@ -67,7 +67,7 @@ public class HistoryRouter<TViewModelBase>: Router<TViewModelBase> where TViewMo
     
     public override void GoTo<T>()
     {
-        var destination = _createViewModel();
+        var destination = CreateViewModel(typeof(T));
         CurrentViewModel = destination;
         Push(destination);
     }

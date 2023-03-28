@@ -4,12 +4,12 @@ public class Router<TViewModelBase> where TViewModelBase:class
 {
 
     private TViewModelBase _currentViewModel = default!;
-    protected readonly Func<TViewModelBase> _createViewModel;
+    protected readonly Func<Type, TViewModelBase> CreateViewModel;
     public event Action<TViewModelBase>? CurrentViewModelChanged;
 
-    public Router(Func<TViewModelBase> createViewModel)
+    public Router(Func<Type, TViewModelBase> createViewModel)
     {
-        _createViewModel = createViewModel;
+        CreateViewModel = createViewModel;
     }
 
     protected TViewModelBase CurrentViewModel
@@ -29,7 +29,7 @@ public class Router<TViewModelBase> where TViewModelBase:class
 
     public virtual void GoTo<T>() where T : TViewModelBase
     {
-        CurrentViewModel = _createViewModel();
+        CurrentViewModel = CreateViewModel(typeof(T));
     }
 
 }
