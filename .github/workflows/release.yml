@@ -1,0 +1,46 @@
+name: Release
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+env:
+  GITHUB_USER: 'sandreas'
+  PROJECT_NAME: 'Avalonia.SimpleRouter'
+  PACKAGE_ID: 'Sandreas.Avalonia.SimpleRouter'
+  PROJECT_PATH: 'Avalonia.SimpleRouter/Avalonia.SimpleRouter.csproj'
+  DOTNET_VERSION: '6.0.401'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      
+      #- name: Install workloads
+      #  run: |
+      #    dotnet workload install android --ignore-failed-sources
+
+      - name: Get version
+        id: version
+        uses: battila7/get-version-action@v2
+
+      - name: Build
+        run: dotnet build Avalonia.SimpleRouter --configuration Release /p:Version=${{ steps.version.outputs.version-without-v }}
+      
+      #      - name: Test
+      #        run: dotnet test --configuration Release /p:Version=${{ steps.version.outputs.version-without-v }} --no-build
+
+      - name: Pack
+        run: dotnet pack  Avalonia.SimpleRouter --configuration Release --include-symbols /p:Version=${{ steps.version.outputs.version-without-v }} --no-build --output .
+
+      - name: Push
+        run: |
+          dotnet nuget push ${{ env.PACKAGE_ID }}.${{ steps.version.outputs.version-without-v }}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGET_API_KEY}}           
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

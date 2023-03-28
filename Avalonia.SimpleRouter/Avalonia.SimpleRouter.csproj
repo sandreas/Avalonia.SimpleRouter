@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <PackageId>Sandreas.Avalonia.SimpleRouter</PackageId>
+        <Authors>sandreas</Authors>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <RepositoryUrl>https://github.com/sandreas/Avalonia.SimpleRouter.git</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/sandreas/Avalonia.SimpleRouter.git</PackageProjectUrl>
+        <PackageTags>avalonia;router;history</PackageTags>
+        <Description>
+            Cross platform view (model) router library for AvaloniaUI
+        </Description>
+        <RootNamespace>Avalonia.SimpleRouter</RootNamespace>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="../README.md" Pack="true" PackagePath="/" />
+    </ItemGroup>
+
+</Project>
