@@ -27,12 +27,14 @@ public class Router<TViewModelBase> where TViewModelBase:class
         CurrentViewModelChanged?.Invoke(viewModel);
     }
 
-    public virtual void GoTo<T>() where T : TViewModelBase
+    public virtual T GoTo<T>() where T : TViewModelBase
     {
-        CurrentViewModel = InstantiateViewModel<T>();
+        var viewModel = InstantiateViewModel<T>();
+        CurrentViewModel = viewModel;
+        return viewModel;
     }
 
-    protected TViewModelBase InstantiateViewModel<T>() where T:TViewModelBase
+    protected T InstantiateViewModel<T>() where T:TViewModelBase
     {
         return (T)Convert.ChangeType(CreateViewModel(typeof(T)), typeof(T));
     }

@@ -33,42 +33,34 @@ public class HistoryRouter<TViewModelBase>: Router<TViewModelBase> where TViewMo
         }
     }
     
-    public void Go(int offset = 0)
+    public TViewModelBase? Go(int offset = 0)
     {
-        
         if (offset == 0)
         {
-            return;
+            return default;
         }
 
         var newIndex = _historyIndex + offset;
         if (newIndex < 0 || newIndex > _history.Count - 1)
         {
-            return;
+            return default;
         }
         _historyIndex = newIndex;
-        CurrentViewModel = _history.ElementAt(_historyIndex);
+        var viewModel = _history.ElementAt(_historyIndex);
+        CurrentViewModel = viewModel;
+        return viewModel;
     }
     
-    public void Back()
-    {
-        if (HasPrev)
-        {
-            Go(-1);
-        }
-    }
-    public void Forward()
-    {
-        if (HasNext)
-        {
-            Go(1);
-        }
-    }    
+    public TViewModelBase? Back() => HasPrev ? Go(-1) : default;
     
-    public override void GoTo<T>()
+    public TViewModelBase? Forward() => HasNext ? Go(1) : default;
+    
+    
+    public override T GoTo<T>()
     {
         var destination = InstantiateViewModel<T>();
         CurrentViewModel = destination;
         Push(destination);
+        return destination;
     }
 }
