@@ -67,7 +67,7 @@ public class HistoryRouter<TViewModelBase>: Router<TViewModelBase> where TViewMo
     
     public override void GoTo<T>()
     {
-        var destination = CreateViewModel(typeof(T));
+        var destination = InstantiateViewModel<T>();
         CurrentViewModel = destination;
         Push(destination);
     }
