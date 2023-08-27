@@ -92,15 +92,23 @@ public partial class MainViewModel : ViewModelBase
 
 ```c#
 // more API method examples
+
+// just navigate to "Home"
+router.GoTo<HomeViewModel>();
+
+// navigate to "Settings", and set a property value
 var settingsVm = router.GoTo<SettingsViewModel>();
 settingsVm.DefaultUsername = "root";
 
+// check history if there is a forward option
 if(router.HasNext) {
-    router.Forward(); // go forward to 
+    router.Forward(); // navigate forward
 }
+
+// check history if there was a previous item
 if(router.HasPrev) {
     router.Back(); // go back to last ViewModel
 }
 
-router.Go(-2); // go back two routes if possible, otherwise stay where you are
+router.Go(-2); // go back two history items if possible, otherwise it will stay where you are
 ```
