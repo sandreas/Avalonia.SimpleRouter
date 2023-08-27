@@ -92,7 +92,8 @@ public partial class MainViewModel : ViewModelBase
 
 ```c#
 // more API method examples
-router.GoTo<SettingsViewModel>();
+var settingsVm = router.GoTo<SettingsViewModel>();
+settingsVm.DefaultUsername = "root";
 
 if(router.HasNext) {
     router.Forward(); // go forward to 
