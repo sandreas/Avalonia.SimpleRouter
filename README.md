@@ -28,7 +28,7 @@ you have to create it manually and add `<local:ViewLocator/>` to your `App.axaml
 Please ensure to change the namespace `ToneAudioPlayer` to match your project.
 
 ## ViewLocator
-This is only required if you don't have the `ViewLocator`, see issue #2.
+This is only required if you don't have the `ViewLocator`, see [issue #2](https://github.com/sandreas/Avalonia.SimpleRouter/issues/2).
 <details>
 
 ```c#
@@ -98,7 +98,7 @@ The `Goto` method will return the destination viewModel, so you can change value
 This is similar to route parameters but type safe and more flexible.
 ```c#
 // navigate to "Settings", and set a property value of the destination viewModel
-var settingsVm = router.GoTo<SettingsViewModel>();
+var settingsVm = _router.GoTo<SettingsViewModel>();
 settingsVm.DefaultUsername = "root";
 ```
 
@@ -106,13 +106,13 @@ settingsVm.DefaultUsername = "root";
 You can check, if there is a routing history by using `HasNext` and `HasPrev` properties.
 ```c#
 // check history if there is a forward option
-if(router.HasNext) {
-    router.Forward(); // navigate forward
+if(_router.HasNext) {
+    _router.Forward(); // navigate forward
 }
 
 // check history if there was a previous item
-if(router.HasPrev) {
-    router.Back(); // go back to last ViewModel
+if(_router.HasPrev) {
+    _router.Back(); // go back to last ViewModel
 }
 ```
 
@@ -120,7 +120,7 @@ if(router.HasPrev) {
 If you would like to navigate by a numeric value, this is also possible.
 ```c#
 // go back two history items if possible, otherwise it will stay where you are
-router.Go(-2);
+_router.Go(-2);
 ```
 
 # Full Code Example
