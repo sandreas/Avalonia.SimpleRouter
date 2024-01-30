@@ -87,7 +87,7 @@ public class ViewLocator : IDataTemplate
 
 ## Examples
 
-** Example: Simple Transition **
+**Example: Simple Transition**
 
 Just change the visible view.
 ```c#
@@ -95,7 +95,7 @@ Just change the visible view.
 _router.GoTo<HomeViewModel>();
 ```
 
-** Example: Transition with parameters **
+**Example: Transition with parameters**
 
 The `Goto` method will return the destination viewModel, so you can change values. 
 This is similar to route parameters but type safe and more flexible.
@@ -105,7 +105,7 @@ var settingsVm = _router.GoTo<SettingsViewModel>();
 settingsVm.DefaultUsername = "root";
 ```
 
-** Example: Check history before transition **
+**Example: Check history before transition**
 
 You can check, if there is a routing history by using `HasNext` and `HasPrev` properties.
 ```c#
@@ -120,7 +120,7 @@ if(_router.HasPrev) {
 }
 ```
 
-** Example: Move in history by numeric value **
+**Example: Move in history by numeric value**
 If you would like to navigate by a numeric value, this is also possible.
 ```c#
 // go back two history items if possible, otherwise it will stay where you are
