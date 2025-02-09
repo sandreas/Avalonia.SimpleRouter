@@ -11,8 +11,20 @@ public class HistoryRouter<TViewModelBase>: Router<TViewModelBase> where TViewMo
     public bool HasNext => _history.Count > 0 && _historyIndex < _history.Count - 1;
     public bool HasPrev => _historyIndex > 0;
     
+    public IReadOnlyCollection<TViewModelBase> History => _history.AsReadOnly();
+    
     public HistoryRouter(Func<Type, TViewModelBase> createViewModel) : base(createViewModel)
     {
+    }
+
+    public TViewModelBase? GetHistoryItem(int offset)
+    {
+        var newIndex = _historyIndex + offset;
+        if (newIndex < 0 || newIndex > _history.Count - 1)
+        {
+            return default;
+        }
+        return _history.ElementAt(newIndex);
     }
     
     // pushState
@@ -42,18 +54,21 @@ public class HistoryRouter<TViewModelBase>: Router<TViewModelBase> where TViewMo
     
     public TViewModelBase? Go(int offset = 0)
     {
+        // don't navigate if offset is 0 (same viewModel)
         if (offset == 0)
         {
             return default;
         }
 
-        var newIndex = _historyIndex + offset;
-        if (newIndex < 0 || newIndex > _history.Count - 1)
+        // viewModel == null means offset is invalid
+        // _historyIndex can be updated after this without further checks
+        var viewModel = GetHistoryItem(offset);
+        if (viewModel == null)
         {
             return default;
         }
-        _historyIndex = newIndex;
-        var viewModel = _history.ElementAt(_historyIndex);
+
+        _historyIndex += offset;
         CurrentViewModel = viewModel;
         return viewModel;
     }
