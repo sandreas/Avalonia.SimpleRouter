@@ -21,15 +21,22 @@ public class HistoryRouter<TViewModelBase>: Router<TViewModelBase> where TViewMo
 
     public void Push(TViewModelBase item)
     {
+        // _historyIndex does not point on the last item on push
+        // so remove everything after current item to prevent conflicts
         if (HasNext)
         {
             _history = _history.Take(_historyIndex + 1).ToList();
         }
+        
+        // add the item and recalculate the index
         _history.Add(item);
         _historyIndex = _history.Count - 1;
+        
+        // _history exceeded _historyMaxSize, so remove first element and correct index
         if (_history.Count > _historyMaxSize)
         {
             _history.RemoveAt(0);
+            _historyIndex--;
         }
     }
     
