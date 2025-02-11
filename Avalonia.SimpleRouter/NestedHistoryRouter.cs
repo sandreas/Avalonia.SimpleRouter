@@ -7,6 +7,8 @@ public class NestedHistoryRouter<TViewModelBase, TMainViewModel>
     where TMainViewModel: TViewModelBase
 {
 
+    private static bool _stackUpdateInProgress = false;
+    
     private int _historyIndex = -1;
     private List<Stack<TViewModelBase>> _history = new();
     private readonly uint _historyMaxSize = 100;
@@ -58,33 +60,47 @@ public class NestedHistoryRouter<TViewModelBase, TMainViewModel>
     
     private void UpdateCurrentViewModelStack(params Type[] viewModelTypes)
     {
-        if (_currentViewModelStack.Count == 0)
+        // prevent recursion when used in constructor
+        if (_stackUpdateInProgress)
         {
-            _currentViewModelStack.Push(CreateViewModel(typeof(TMainViewModel)));
+            return;
         }
-
-        // clone the original stack
-        var viewModelTree = new Stack<TViewModelBase>(_currentViewModelStack.ToArray().Reverse());
-        TViewModelBase parentViewModel = viewModelTree.First();
-        var newViewModelTree = new Stack<TViewModelBase>([parentViewModel]);
-        var counter = 1; // start on 1 because MainViewModel is excluded in viewModelTypes
-        foreach (var type in viewModelTypes)
+        
+        try
         {
-            // viewModels can be reused on the same level
-            var newViewModel = viewModelTree.Count > counter && viewModelTree.ElementAt(counter).GetType() == type
-                ? viewModelTree.ElementAt(counter)
-                : CreateViewModel(type); // this has to be 
-            
-            if (!AreViewModelsEqual(parentViewModel.Content,newViewModel) )
+            _stackUpdateInProgress = true;
+            if (_currentViewModelStack.Count == 0)
             {
-                parentViewModel.Content = newViewModel;
+                _currentViewModelStack.Push(CreateViewModel(typeof(TMainViewModel)));
             }
-            
-            newViewModelTree.Push(newViewModel);
-            counter++;
-        }
 
-        _currentViewModelStack = newViewModelTree;
+            // clone the original stack
+            var viewModelTree = new Stack<TViewModelBase>(_currentViewModelStack.ToArray().Reverse());
+            TViewModelBase parentViewModel = viewModelTree.First();
+            var newViewModelTree = new Stack<TViewModelBase>([parentViewModel]);
+            var counter = 1; // start on 1 because MainViewModel is excluded in viewModelTypes
+            foreach (var type in viewModelTypes)
+            {
+                // viewModels can be reused on the same level
+                var newViewModel = viewModelTree.Count > counter && viewModelTree.ElementAt(counter).GetType() == type
+                    ? viewModelTree.ElementAt(counter)
+                    : CreateViewModel(type); // this has to be 
+                if (!AreViewModelsEqual(parentViewModel.Content,newViewModel) )
+                {
+                    parentViewModel.Content = newViewModel;
+                }
+            
+                newViewModelTree.Push(newViewModel);
+                counter++;
+            }
+
+            _currentViewModelStack = newViewModelTree;
+        }
+        finally
+        {
+            _stackUpdateInProgress = false;
+        }
+        
     }
     
     public Stack<TViewModelBase> GetHistoryItem(int offset)
