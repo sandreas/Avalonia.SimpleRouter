@@ -7,7 +7,10 @@ public class NestedHistoryRouter<TViewModelBase, TMainViewModel>
     where TMainViewModel: TViewModelBase
 {
 
-    private static bool _stackUpdateInProgress = false;
+    
+    // ReSharper disable once StaticMemberInGenericType (Reason: NestedHistoryRouter is Singleton)
+    // In the vast majority of cases, having a static field in a generic type is a sign of an error. The reason for this is that a static field in a generic type will not be shared among instances of different close constructed types. This means that for a generic class C<T> which has a static field X, the values of C<int>.X and C<string>.X have completely different, independent values.
+    private static bool _stackUpdateInProgress;
     
     private int _historyIndex = -1;
     private List<Stack<TViewModelBase>> _history = new();
@@ -95,6 +98,7 @@ public class NestedHistoryRouter<TViewModelBase, TMainViewModel>
             }
 
             _currentViewModelStack = newViewModelTree;
+            Push(_currentViewModelStack);
         }
         finally
         {
@@ -113,7 +117,7 @@ public class NestedHistoryRouter<TViewModelBase, TMainViewModel>
         return _history.ElementAt(newIndex);
     }
     
-    public void Push(Stack<TViewModelBase> stack)
+    private void Push(Stack<TViewModelBase> stack)
     {
         // _historyIndex does not point on the last item on push
         // so remove everything after current item to prevent conflicts
@@ -133,6 +137,40 @@ public class NestedHistoryRouter<TViewModelBase, TMainViewModel>
             _historyIndex--;
         }
     }
+    
+    public Stack<TViewModelBase> Go(int offset = 0)
+    {
+        // don't navigate if offset is 0 (same viewModel)
+        if (offset == 0)
+        {
+            return _currentViewModelStack;
+        }
+
+        // viewModel == null means offset is invalid
+        // _historyIndex can be updated after this without further checks
+        var viewModelStack = GetHistoryItem(offset);
+        if (!viewModelStack.Any())
+        {
+            return viewModelStack;
+        }
+
+        if (viewModelStack.Any())
+        {
+            _historyIndex += offset;
+            _currentViewModelStack = viewModelStack;
+            if (viewModelStack.Count > 1)
+            {
+                var mainViewModel = viewModelStack.FirstOrDefault() ?? CreateViewModel(typeof(TMainViewModel));
+                mainViewModel.Content = viewModelStack.ElementAt(1);
+            }
+        }
+
+        return viewModelStack;
+    }
+    
+    public Stack<TViewModelBase> Back() => HasPrev ? Go(-1) : _currentViewModelStack;
+    
+    public Stack<TViewModelBase> Forward() => HasNext ? Go(1) : _currentViewModelStack;
     
     public Stack<TViewModelBase> GoTo<T>() 
         where T : TViewModelBase => Goto(typeof(T));
