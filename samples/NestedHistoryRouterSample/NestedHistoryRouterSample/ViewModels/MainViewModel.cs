@@ -10,6 +10,6 @@ public class MainViewModel : ViewModelBase
 
     public MainViewModel(NestedHistoryRouter<ViewModelBase, MainViewModel> router)
     {
-        router.GoTo<HomeViewModel>();
+        router.GoTo<HomeViewModel,FirstSubViewModel>();
     }
 }

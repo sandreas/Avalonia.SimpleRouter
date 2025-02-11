@@ -16,9 +16,8 @@
         <SplitView.Pane>
 
             <StackPanel>
-                <Button>One</Button>
-                <Button>Two</Button>
-                <Button>Three</Button>
+                <Button Command="{Binding NavigateToCommand}" CommandParameter="FirstSubView">FirstSubView</Button>
+                <Button Command="{Binding NavigateToCommand}" CommandParameter="SecondSubView">SecondSubView</Button>
             </StackPanel>
 
 

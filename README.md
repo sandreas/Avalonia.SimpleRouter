@@ -211,9 +211,113 @@ public partial class MainViewModel : ViewModelBase
         // register route changed event to set content to viewModel, whenever 
         // a route changes
         router.CurrentViewModelChanged += viewModel => Content = viewModel;
-        
+        Currently,
         // change to HomeView 
         router.GoTo<HomeViewModel>();
     }
 }
 ```
+
+
+# Experimental: Nested Routing
+
+A new approach containing nested routing can be tried with the new `NestedHistoryRouter` class. It is under development
+but can be tested independently of the default `HistoryRouter`. At the moment the `History` part does not work and the new class only has been integrated to get early feedback.
+Here is how it works (or at least should):
+
+```c#
+// ViewModels/ViewModelBase.cs
+
+// Usage of CommunityToolkit (ObservableProperty) and Interface ISimpleRoute
+public abstract partial class ViewModelBase : ObservableObject, ISimpleRoute<ViewModelBase>
+{
+    [ObservableProperty] private ViewModelBase? _content;
+    // public ViewModelBase? Content { get; set; }
+}
+```
+
+```c#
+// ViewModels/MainViewModel.cs
+public class MainViewModel : ViewModelBase
+{
+    public MainViewModel(NestedHistoryRouter<ViewModelBase, MainViewModel> router)
+    {
+        // level1: HomeViewModel, level2: SubViewModel
+        router.GoTo<HomeViewModel, SubViewModel>();
+    }
+}
+```
+
+```xml
+<!-- MainView.axaml - do not forget to replace TestApp with your App name-->
+    
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:TestApp.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TestApp.Views.MainView"
+             x:DataType="vm:MainViewModel">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:MainViewModel />
+  </Design.DataContext>
+
+    <ContentControl Content="{Binding Content}" />
+</UserControl>
+```
+
+
+```xml
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:TestApp.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TestApp.Views"
+             x:DataType="vm:HomeViewModel">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:HomeViewModel />
+  </Design.DataContext>
+
+    <SplitView DisplayMode="Inline" OpenPaneLength="400" IsPaneOpen="True">
+        <SplitView.Pane>
+
+            <StackPanel>
+                <Button>SubView</Button>
+            </StackPanel>
+
+
+        </SplitView.Pane>
+
+        <ContentControl Content="{Binding Content}"></ContentControl>
+
+    </SplitView>
+</UserControl>
+```
+
+```xml
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vmh="clr-namespace:TestApp.ViewModels.Home"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TestApp.Views.SubView"
+             x:DataType="vmh:SubViewModel">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vmh:SubViewModel />
+  </Design.DataContext>
+    <TextBlock>One</TextBlock>
+</UserControl>
+
+
+```
+

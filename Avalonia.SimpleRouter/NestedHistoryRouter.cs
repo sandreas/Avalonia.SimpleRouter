@@ -13,13 +13,13 @@ public class NestedHistoryRouter<TViewModelBase, TMainViewModel>
     private static bool _stackUpdateInProgress;
     
     private int _historyIndex = -1;
-    private List<Stack<TViewModelBase>> _history = new();
+    private List<TViewModelBase[]> _history = new();
     private readonly uint _historyMaxSize = 100;
     public bool HasNext => _history.Count > 0 && _historyIndex < _history.Count - 1;
     public bool HasPrev => _historyIndex > 0;
     
-    public IReadOnlyCollection<Stack<TViewModelBase>> History => _history.AsReadOnly();
-    private Stack<TViewModelBase> _currentViewModelStack = new();
+    public IReadOnlyCollection<TViewModelBase[]> History => _history.AsReadOnly();
+    private List<TViewModelBase> _currentViewModelPack = new();
     
     protected readonly Func<Type, TViewModelBase> CreateViewModel;
 
@@ -28,35 +28,6 @@ public class NestedHistoryRouter<TViewModelBase, TMainViewModel>
         CreateViewModel = createViewModel;
     }
 
-    /*
-    // TODO: implement history
-    public void UpdateCurrentViewModel(params TViewModelBase[] viewModels)
-    {
-        // clone the original stack
-        var viewModelTree = new Stack<TViewModelBase>(_currentViewModelStack.ToArray().Reverse());
-        var newViewModelTree = new Stack<TViewModelBase>();
-        var counter = 0;
-        TViewModelBase lastViewModel = _mainViewModel;
-        newViewModelTree.Push(_mainViewModel);
-        foreach (var vm in viewModels)
-        {
-            // viewModels can be reused on the same level
-            var newViewModel = viewModelTree.Count >= counter && AreViewModelsEqual(viewModelTree.ElementAt(counter), vm)
-                ? viewModelTree.ElementAt(counter)
-                : vm; // this has to be 
-            
-            if (!AreViewModelsEqual(lastViewModel.Content , newViewModel) )
-            {
-                lastViewModel.Content = newViewModel;
-            }
-            
-            newViewModelTree.Push(newViewModel);
-            counter++;
-        }
-
-        _currentViewModelStack = newViewModelTree;
-    }
-*/
     
     private static bool AreViewModelsEqual(TViewModelBase? first, TViewModelBase? second) => EqualityComparer<TViewModelBase?>.Default.Equals(first, second);
 
@@ -72,20 +43,20 @@ public class NestedHistoryRouter<TViewModelBase, TMainViewModel>
         try
         {
             _stackUpdateInProgress = true;
-            if (_currentViewModelStack.Count == 0)
+            if (_currentViewModelPack.Count == 0)
             {
-                _currentViewModelStack.Push(CreateViewModel(typeof(TMainViewModel)));
+                _currentViewModelPack.Add(CreateViewModel(typeof(TMainViewModel)));
             }
 
             // clone the original stack
-            var viewModelTree = new Stack<TViewModelBase>(_currentViewModelStack.ToArray().Reverse());
+            var viewModelTree = _currentViewModelPack.ToArray();
             TViewModelBase parentViewModel = viewModelTree.First();
-            var newViewModelTree = new Stack<TViewModelBase>([parentViewModel]);
+            var newViewModelTree = new List<TViewModelBase>(){parentViewModel};
             var counter = 1; // start on 1 because MainViewModel is excluded in viewModelTypes
             foreach (var type in viewModelTypes)
             {
                 // viewModels can be reused on the same level
-                var newViewModel = viewModelTree.Count > counter && viewModelTree.ElementAt(counter).GetType() == type
+                var newViewModel = viewModelTree.Length > counter && viewModelTree.ElementAt(counter).GetType() == type
                     ? viewModelTree.ElementAt(counter)
                     : CreateViewModel(type); // this has to be 
                 if (!AreViewModelsEqual(parentViewModel.Content,newViewModel) )
@@ -93,12 +64,13 @@ public class NestedHistoryRouter<TViewModelBase, TMainViewModel>
                     parentViewModel.Content = newViewModel;
                 }
             
-                newViewModelTree.Push(newViewModel);
+                newViewModelTree.Add(newViewModel);
+                parentViewModel = newViewModel;
                 counter++;
             }
 
-            _currentViewModelStack = newViewModelTree;
-            Push(_currentViewModelStack);
+            _currentViewModelPack = newViewModelTree;
+            Push(_currentViewModelPack.ToArray());
         }
         finally
         {
@@ -107,17 +79,17 @@ public class NestedHistoryRouter<TViewModelBase, TMainViewModel>
         
     }
     
-    public Stack<TViewModelBase> GetHistoryItem(int offset)
+    public TViewModelBase[] GetHistoryItem(int offset)
     {
         var newIndex = _historyIndex + offset;
         if (newIndex < 0 || newIndex > _history.Count - 1)
         {
-            return new();
+            return [];
         }
         return _history.ElementAt(newIndex);
     }
     
-    private void Push(Stack<TViewModelBase> stack)
+    private void Push(TViewModelBase[] stack)
     {
         // _historyIndex does not point on the last item on push
         // so remove everything after current item to prevent conflicts
@@ -138,56 +110,56 @@ public class NestedHistoryRouter<TViewModelBase, TMainViewModel>
         }
     }
     
-    public Stack<TViewModelBase> Go(int offset = 0)
+    public TViewModelBase[] Go(int offset = 0)
     {
         // don't navigate if offset is 0 (same viewModel)
         if (offset == 0)
         {
-            return _currentViewModelStack;
+            return _currentViewModelPack.ToArray();
         }
 
         // viewModel == null means offset is invalid
         // _historyIndex can be updated after this without further checks
-        var viewModelStack = GetHistoryItem(offset);
-        if (!viewModelStack.Any())
+        var viewModelPack = GetHistoryItem(offset);
+        if (!viewModelPack.Any())
         {
-            return viewModelStack;
+            return viewModelPack;
         }
 
-        if (viewModelStack.Any())
+        if (viewModelPack.Any())
         {
             _historyIndex += offset;
-            _currentViewModelStack = viewModelStack;
-            if (viewModelStack.Count > 1)
+            _currentViewModelPack = viewModelPack.ToList();
+            if (viewModelPack.Length > 1)
             {
-                var mainViewModel = viewModelStack.FirstOrDefault() ?? CreateViewModel(typeof(TMainViewModel));
-                mainViewModel.Content = viewModelStack.ElementAt(1);
+                var mainViewModel = viewModelPack.FirstOrDefault() ?? CreateViewModel(typeof(TMainViewModel));
+                mainViewModel.Content = viewModelPack.ElementAt(1);
             }
         }
 
-        return viewModelStack;
+        return viewModelPack;
     }
     
-    public Stack<TViewModelBase> Back() => HasPrev ? Go(-1) : _currentViewModelStack;
+    public TViewModelBase[] Back() => HasPrev ? Go(-1) : _currentViewModelPack.ToArray();
     
-    public Stack<TViewModelBase> Forward() => HasNext ? Go(1) : _currentViewModelStack;
+    public TViewModelBase[] Forward() => HasNext ? Go(1) : _currentViewModelPack.ToArray();
     
-    public Stack<TViewModelBase> GoTo<T>() 
+    public TViewModelBase[] GoTo<T>() 
         where T : TViewModelBase => Goto(typeof(T));
     
-    public Stack<TViewModelBase> GoTo<T1, T2>() 
+    public TViewModelBase[] GoTo<T1, T2>() 
         where T1 : TViewModelBase 
         where T2: TViewModelBase => Goto(typeof(T1), typeof(T2));
 
-    public Stack<TViewModelBase> GoTo<T1, T2, T3>() 
+    public TViewModelBase[] GoTo<T1, T2, T3>() 
         where T1 : TViewModelBase 
         where T2 : TViewModelBase 
         where T3: TViewModelBase => Goto(typeof(T1), typeof(T2), typeof(T3));
     
-    public Stack<TViewModelBase> Goto(params Type[] viewModelTypes)
+    public TViewModelBase[] Goto(params Type[] viewModelTypes)
     {
         UpdateCurrentViewModelStack(viewModelTypes);
-        return _currentViewModelStack;
+        return _currentViewModelPack.ToArray();
     }
     
      

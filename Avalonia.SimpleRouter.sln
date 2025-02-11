@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Avalonia.SimpleRouter", "Avalonia.SimpleRouter\Avalonia.SimpleRouter.csproj", "{79B37242-BD4B-4AF7-A69A-5595954FC2CE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{EEF340C6-3983-4DE7-9CAD-9A2967D005A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp.Desktop", "TestApp.Desktop\TestApp.Desktop.csproj", "{D731F611-C717-4198-8803-9C933F58D821}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{79B37242-BD4B-4AF7-A69A-5595954FC2CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79B37242-BD4B-4AF7-A69A-5595954FC2CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79B37242-BD4B-4AF7-A69A-5595954FC2CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEF340C6-3983-4DE7-9CAD-9A2967D005A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEF340C6-3983-4DE7-9CAD-9A2967D005A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEF340C6-3983-4DE7-9CAD-9A2967D005A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEF340C6-3983-4DE7-9CAD-9A2967D005A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D731F611-C717-4198-8803-9C933F58D821}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D731F611-C717-4198-8803-9C933F58D821}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D731F611-C717-4198-8803-9C933F58D821}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D731F611-C717-4198-8803-9C933F58D821}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
