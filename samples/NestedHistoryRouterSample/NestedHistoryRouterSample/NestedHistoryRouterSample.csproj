@@ -25,4 +25,12 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Avalonia.SimpleRouter\Avalonia.SimpleRouter.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="Views\Home\ThirdSubView.axaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Views\Home\ThirdSubView.axaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
 </Project>

@@ -66,6 +66,7 @@ public partial class App : Application
         services.AddTransient<HomeViewModel>();
         services.AddTransient<FirstSubViewModel>();
         services.AddTransient<SecondSubViewModel>();
+        services.AddTransient<ThirdSubViewModel>();
 
         services.AddSingleton<NestedHistoryRouter<ViewModelBase, MainViewModel>>(s => 
             new NestedHistoryRouter<ViewModelBase, MainViewModel>( t => (ViewModelBase)s.GetRequiredService(t)));

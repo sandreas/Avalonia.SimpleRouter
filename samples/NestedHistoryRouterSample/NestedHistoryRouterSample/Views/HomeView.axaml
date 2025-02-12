@@ -11,19 +11,32 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:HomeViewModel />
     </Design.DataContext>
-    
-    <SplitView DisplayMode="Inline" OpenPaneLength="400" IsPaneOpen="True">
-        <SplitView.Pane>
+    <Grid RowDefinitions="Auto,*">
+        <Grid ColumnDefinitions="400,*" Background="Indigo">
+            <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,15,10,0" Height="40">Breadcrumb-Menu</TextBlock>
+            
+            <ItemsControl Grid.Row="0" Grid.Column="1" ItemsSource="{Binding BreadCrumbItems}" Height="40">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,15,0,0"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </Grid>
+        
+        <SplitView Grid.Row="1" DisplayMode="Inline" OpenPaneLength="400" IsPaneOpen="True">
+            <SplitView.Pane>
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,*">
+                    <Button Grid.Row="0" Grid.Column="0" Command="{Binding NavigateToCommand}" CommandParameter="Back">⏪</Button>
 
-            <StackPanel>
-                <Button Command="{Binding NavigateToCommand}" CommandParameter="FirstSubView">FirstSubView</Button>
-                <Button Command="{Binding NavigateToCommand}" CommandParameter="SecondSubView">SecondSubView</Button>
-            </StackPanel>
+                    <Button Grid.Row="0" Grid.Column="1" Command="{Binding NavigateToCommand}" CommandParameter="Forward">⏩</Button>
 
-
-        </SplitView.Pane>
-        <ContentControl Content="{Binding Content}"/>
-    </SplitView>
-    
-
+                    <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Command="{Binding NavigateToCommand}" CommandParameter="FirstSubView">FirstSubView</Button>
+                    <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Command="{Binding NavigateToCommand}" CommandParameter="SecondSubView">SecondSubView</Button>
+                    <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Command="{Binding NavigateToCommand}" CommandParameter="ThirdSubView">ThirdSubView</Button>
+                </Grid>
+            </SplitView.Pane>
+            <ContentControl Content="{Binding Content}"/>
+        </SplitView>
+    </Grid>
 </UserControl>
