@@ -15,6 +15,7 @@ Since this is a dependency free implementation of a simple Router, you might als
 - Parameters / ViewModel Properties
 - Routing history including `Back` and `Forward`
 - Extendable and flexible
+- Nested Routing Support (experimental)
 
 
 # API examples
