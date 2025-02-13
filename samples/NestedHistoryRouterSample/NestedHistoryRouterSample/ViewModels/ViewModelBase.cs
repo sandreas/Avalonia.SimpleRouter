@@ -6,7 +6,4 @@ namespace NestedHistoryRouterSample.ViewModels;
 public abstract partial class ViewModelBase : ObservableObject, ISimpleRoute<ViewModelBase>
 {
     [ObservableProperty] private ViewModelBase? _content;
-    // public ViewModelBase? Content { get; set; }
-    // [ObservableProperty] private string _etwas = "hallo";
-
 }
